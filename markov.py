@@ -111,21 +111,15 @@ def make_text(chains, n):
 
 
 def tweet(random_text):
+    """ Posts status and asks user to send another tweet """
+
     while True:
-
         random_text = make_text(chains, n)
-
         status = api.PostUpdate(random_text)
-
         print random_text
-
         tweet_again = raw_input("Would you like to send another tweet? y/n: ")
-
         if tweet_again != "y":
             break
-
-
-
 
 
 input_path = sys.argv[1]
