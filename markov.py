@@ -3,6 +3,17 @@
 
 from random import choice
 import sys
+import os
+import twitter
+
+api = twitter.Api(
+    consumer_key=os.environ["TWITTER_CONSUMER_KEY"],
+    consumer_secret=os.environ["TWITTER_CONSUMER_SECRET"],
+    access_token_key=os.environ["TWITTER_ACCESS_TOKEN_KEY"],
+    access_token_secret=os.environ["TWITTER_ACCESS_TOKEN_SECRET"]
+    )
+
+print api.VerifyCredentials()
 
 n = int(raw_input("What size would you like your n-grams to be? "))
 
@@ -59,7 +70,7 @@ def make_chains(text_string, n):
         try:
             chains[key].append(words[i+n])
         except:
-            chains[key].append(None)
+            chains[key].append(" ")
 
     return chains
 
@@ -86,14 +97,35 @@ def make_text(chains, n):
     current_key = choice(upper_chains)
     words.extend(current_key)
 
-    while True:
+    words_length = len(" ".join(words))
+
+    while words_length < 130:
         new_link = choice(chains[current_key])
         words.append(new_link)
         current_key = tuple(words[-n:])
-        if None in chains[current_key]:
+        words_length = len(" ".join(words))
+        if " " in chains[current_key]:
             break
 
     return " ".join(words)
+
+
+def tweet(random_text):
+    while True:
+
+        random_text = make_text(chains, n)
+
+        status = api.PostUpdate(random_text)
+
+        print random_text
+
+        tweet_again = raw_input("Would you like to send another tweet? y/n: ")
+
+        if tweet_again != "y":
+            break
+
+
+
 
 
 input_path = sys.argv[1]
@@ -107,4 +139,4 @@ chains = make_chains(input_text, n)
 # Produce random text
 random_text = make_text(chains, n)
 
-print random_text
+tweet(random_text)
